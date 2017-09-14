@@ -1,0 +1,29 @@
+{
+  "name": "otter-cli",
+  "version": "1.0.0",
+  "description": "A command-line tool to work with otter.io",
+  "main": "index.js",
+  "scripts": {
+    "test": "otter-test",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Benevolent-Roosters/otter-cli.git"
+  },
+  "keywords": [
+    "otter-cli"
+  ],
+  "author": "Benevolent-Roosters",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Benevolent-Roosters/otter-cli/issues"
+  },
+  "homepage": "https://github.com/Benevolent-Roosters/otter-cli#readme",
+  "dependencies": {
+    "axios": "^0.16.2",
+    "express": "^4.15.4",
+    "inquirer": "^3.2.3",
+    "nodemon": "^1.12.0"
+  }
+}
