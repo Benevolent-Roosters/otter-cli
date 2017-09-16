@@ -5,13 +5,15 @@ var inquirer = require('inquirer');
 var prompt = inquirer.createPromptModule();
 var readJson = require('read-package-json');
 var Promise = require('bluebird');
+var Table = require('cli-table2');
 
 const app = express();
 
 const PORT = process.env.port || 5000;
 
-let api_key;
 let user_id;
+let github_handle;
+let api_key;
 let board_id;
 
 // app.use(middleware.morgan('dev'));
@@ -24,10 +26,10 @@ let board_id;
 // app.use('/api', middleware.auth.verifyElse401, routes.api);
 
 /** READ BOARD URL FROM PACKAGE.JSON **/
-let readJSON = Promise.promisify(readJson);
+const readJSON = Promise.promisify(readJson);
 
 /** SWITCH STATEMENT TO IDENTIFY THE COMMAND TO RUN BASED ON USER INPUT **/
-let commandRunner = (command) => {
+const commandRunner = (command) => {
   switch (command) {
     case 'Display Tickets':
       return ticketDisplayCommandPrompt();
@@ -37,13 +39,13 @@ let commandRunner = (command) => {
 };
 
 /** SWITCH STATEMENT SPECIFICALLY FOR TICKET DISPLAY OPTIONS **/
-let ticketDisplayCommandRunner = (command) => {
+const ticketDisplayCommandRunner = (command) => {
   switch (command) {
-    case 'Display All My Tickets':
-      return grabBoardId();
-    case 'Display All Panel Tickets':
+    case 'Display My Tickets':
+      return displayAllMyTickets();
+    case 'Display Panel Tickets':
       return displayAllPanelTickets();
-    case 'Display All My Panel Tickets':
+    case 'Display My Panel Tickets':
       return displayAllMyPanelTickets();
     default:
       console.log('Something went wrong when displaying tickets!')
@@ -51,21 +53,23 @@ let ticketDisplayCommandRunner = (command) => {
 };
 
 /** VERIFY API KEY PROMPT QUESTION INFO **/
-let verifyAPIKeyQuestions = {
+const verifyAPIKeyQuestions = {
   type: 'input', 
   name: 'api_key', 
   message: 'Please Enter Your API key:'
 };
 
 /** VERIFY USER INPUTTED API KEY **/
-let verifyAPIKey = () => {
+const verifyAPIKey = () => {
   prompt(verifyAPIKeyQuestions).then(answers => {
     axios.get('http://localhost:3000/cli/api_key', {params: answers})
     .then(response => {
       user_id = response.data.id;
+      github_handle = response.data.github_handle;
       api_key = response.data.api_key;
       console.log(response.data);
-      commandPrompt();
+      grabBoardId()
+      // commandPrompt();
       //process.stdout.write(response.data);
     })
     .catch(error => {
@@ -76,8 +80,26 @@ let verifyAPIKey = () => {
   });
 };
 
+/** GRAB BOARD ID USING GITHUB REPO URL **/
+const grabBoardId = () => {
+  readJSON('./package.json', console.error, true)
+    .then(response => {
+      axios.get('http://localhost:3000/cli/board', {params: {repo_url: 'https://github.com/Benevolent-Roosters/thesis3', api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
+        .then(boardInfo => {
+          board_id = boardInfo.data.id;
+          console.log('board received:', boardInfo.data);
+          commandPrompt(); //if board successfully grabbed, initiate command prompt
+        })
+
+        .catch(error => {
+          console.log('ERROR grabbing board id with repo url:', error.data);
+          verifyAPIKey();
+        })
+    });
+}
+
 /** VERIFY INITIAL COMMAND PROMPT QUESTION INFO **/
-let commandPromptQuestions = {
+const commandPromptQuestions = {
   type: 'list',
   name: 'command',
   message: 'What operation do you want to perform next?',
@@ -85,7 +107,7 @@ let commandPromptQuestions = {
 };
 
 /** TAKE IN USER INPUTTED COMMAND AND PASS THROUGH SWITCH STATEMENT **/
-let commandPrompt = () => {
+const commandPrompt = () => {
   prompt(commandPromptQuestions)
     .then(answers => {
       commandRunner(answers.command);
@@ -98,15 +120,15 @@ let commandPrompt = () => {
 };
 
 /** VERIFY DISPLAY TICKET COMMAND PROMPT QUESTION INFO **/
-let commandDisplayTicketsOptions = {
+const commandDisplayTicketsOptions = {
   type: 'list',
   name: 'displayTicketsOptions',
   message: 'Choose a category to perform an action',
-  choices: ['Display All My Tickets', 'Display All Panel Tickets', 'Display My Panel Tickets']
+  choices: ['Display My Tickets', 'Display Panel Tickets', 'Display My Panel Tickets']
 };
 
 /** TAKE USER INPUTTED DISPLAY TICKET COMMAND AND PASS THROUGH SWITCH STATEMENT **/
-let ticketDisplayCommandPrompt = () => {
+const ticketDisplayCommandPrompt = () => {
   prompt(commandDisplayTicketsOptions)
     .then(answers => {
       ticketDisplayCommandRunner(answers.displayTicketsOptions);
@@ -118,44 +140,102 @@ let ticketDisplayCommandPrompt = () => {
     })
 };
 
-/** GRAB BOARD ID USING GITHUB REPO URL **/
-let grabBoardId = () => {
-  readJSON('./package.json', console.error, true)
-    .then(response => {
-      axios.get('http://localhost:3000/cli/board', {params: {repo_url: 'https://github.com/Benevolent-Roosters/thesis', api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
-        .then(boardInfo => {
-          board_id = boardInfo.id;
-          console.log('board received:', boardInfo.data);
-        })
+/** TABLE DISPLAY FOR displayAllMyTickets() **/
+let displayAllMyTicketsTable = new Table({
+  head: ['Ticket_id', 'Title', 'Description', 'Status', 'Priority', 'Type', 'Assignee_handle', 'Panel_id'], 
+  colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
+});
 
-        .catch(error => {
-          console.log('ERROR grabbing board id with repo url:', error.data);
-        })
+/** DISPLAY ALL MY TICKETS **/
+const displayAllMyTickets = () => {
+  axios.get('http://localhost:3000/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle }})
+    .then(tickets => {
+
+      tickets.data.forEach(ticket => {
+        displayAllMyTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
+      });
+
+      console.log(displayAllMyTicketsTable.toString());
+      commandPrompt();
+    })
+
+    .catch(error => {
+      console.log('Error displaying all tickets');      
+      console.log(displayAllMyTicketsTable.toString());
+      commandPrompt();
     });
 }
 
-/** DISPLAY ALL MY TICKETS **/
-// let displayAllMyTickets = () => {
-//   axios.get('/cli/tickets', {api_key: api_key, board_id: })
-//     .then(tickets => {
-//       console.log('Here are your Tickets:', tickets);
-//     })
+/** PROMPT FOR PANEL NAME (USED FOR displayAllPanelTickets() AND displayAllMyPanelTickets()) **/
+const promptForPanelNameQuestion = {
+  type: 'input',
+  name: 'panel_id',
+  message: "What is the panel'\s id?"
+};
 
-//     .catch(error => {
-//       console.log('Error displaying all tickets');
-//     });
-// }
+/** TABLE DISPLAY FOR displayAllPanelTickets() **/
+let displayAllPanelTicketsTable = new Table({
+  head: ['Ticket_id', 'Title', 'Description', 'Status', 'Priority', 'Type', 'Assignee_handle', 'Panel_id'], 
+  colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
+});
 
-app.listen(PORT, () => {
-  console.log('Welcome to Otter-CLI! Please enter your API key below to continue!');
+/** DISPLAY ALL TICKETS OF ASSOCIATED PANEL **/
+const displayAllPanelTickets = () => {
+  prompt(promptForPanelNameQuestion)
+    .then(answer => {
+      axios.get('http://localhost:3000/cli/panel/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, panel_id: answer.panel_id }})
+        .then(tickets => {
 
-  verifyAPIKey();
+          tickets.data.forEach(ticket => {
+            displayAllPanelTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
+          });
+    
+          console.log(displayAllPanelTicketsTable.toString());
+          commandPrompt();
+        })
 
+        .catch(error => {
+          console.log('Error on getting Tickets for this Panel!');
+          console.log(displayAllPanelTicketsTable.toString());
+          commandPrompt();
+        });
+    })
+};
+
+/** TABLE DISPLAY FOR displayAllPanelTickets() **/
+let displayAllMyPanelTicketsTable = new Table({
+  head: ['Ticket_id', 'Title', 'Description', 'Status', 'Priority', 'Type', 'Assignee_handle', 'Panel_id'], 
+  colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
 });
 
 
+/** DISPLAY ALL OF USER'S TICKETS ASSOCIATED WITH A PANEL **/
+const displayAllMyPanelTickets = () => {
+  prompt(promptForPanelNameQuestion)
+    .then(answer => {
+      axios.get('http://localhost:3000/cli/mypaneltickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle, panel_id: answer.panel_id }})
+        .then(tickets => {
 
-// readJSON('./package.json', console.error, true)
-//   .then(response => {
-//     console.log(response.repository.url.slice(4, -4));
-//   });
+          tickets.data.forEach(ticket => {
+            displayAllMyPanelTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
+          });
+    
+          console.log(displayAllMyPanelTicketsTable.toString());
+          commandPrompt();
+        })
+
+        .catch(error => {
+          console.log('Error on getting Tickets for this Panel!');
+          console.log(displayAllMyPanelTicketsTable.toString());
+          commandPrompt();
+        });
+    });
+};
+
+
+app.listen(PORT, () => {
+  console.log('Welcome to Otter-CLI! Please enter your API key below to continue!');
+  
+  verifyAPIKey();
+
+});
