@@ -1,28 +1,33 @@
-'use strict';
-const express = require('express');
 const axios = require('axios');
+const Table = require('cli-table2');
 const inquirer = require('inquirer');
 const prompt = inquirer.createPromptModule();
-const readJson = require('read-package-json');
-const Promise = require('bluebird');
-const Table = require('cli-table2');
-let runner = require('./commandRunners');
-let verifyUser = require('./actions/verifyUser');
+let commandPrompts = require('../commandPrompts');
+let verifyUser = require('../actions/verifyUser');
 
-const app = express();
+/** GLOBAL VARIABLES **/
 
-const PORT = process.env.port || 5000;
+let globalVars;
+let user_id;
+let github_handle;
+let api_key;
+let board_id;
 
-// app.use(middleware.morgan('dev'));
-// app.use(middleware.bodyParser.urlencoded({extended: false}));
-// app.use(middleware.bodyParser.json());
+/** SET GLOBAL VARIABLES **/
+const setGlobalsVariables = () => {
+  globalVars = verifyUser.exportGlobals();
+  user_id = globalVars.user_id;
+  github_handle = globalVars.github_handle;
+  api_key = globalVars.api_key;
+  board_id = globalVars.board_id;
+}
 
-// app.use(express.static(path.join(__dirname, '../public')));
-
-// app.use('/', routes.auth);
-// app.use('/api', middleware.auth.verifyElse401, routes.api);
-
-
+/** PROMPT FOR PANEL NAME (USED FOR displayAllPanelTickets() AND displayAllMyPanelTickets()) **/
+const promptForPanelNameQuestion = {
+  type: 'input',
+  name: 'panel_id',
+  message: "What is the panel'\s id?"
+};
 
 /** TABLE DISPLAY FOR displayAllPanelTickets() **/
 let displayAllMyPanelTicketsTable = new Table({
@@ -33,6 +38,9 @@ let displayAllMyPanelTicketsTable = new Table({
 
 /** DISPLAY ALL OF USER'S TICKETS ASSOCIATED WITH A PANEL **/
 const displayAllMyPanelTickets = () => {
+
+  !globalVars ? setGlobalsVariables() : '';
+
   prompt(promptForPanelNameQuestion)
     .then(answer => {
       axios.get('http://localhost:3000/cli/mypaneltickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle, panel_id: answer.panel_id }})
@@ -43,21 +51,15 @@ const displayAllMyPanelTickets = () => {
           });
     
           console.log(displayAllMyPanelTicketsTable.toString());
-          commandPrompt();
+          commandPrompts.commandPrompt();
         })
 
         .catch(error => {
           console.log('Error on getting Tickets for this Panel!');
           console.log(displayAllMyPanelTicketsTable.toString());
-          commandPrompt();
+          commandPrompts.commandPrompt();
         });
     });
 };
 
-
-app.listen(PORT, () => {
-  console.log('Welcome to Otter-CLI! Please enter your API key below to continue!');
-  
-  verifyUser.verifyAPIKey();
-
-});
+module.exports.displayAllMyPanelTickets = displayAllMyPanelTickets;
