@@ -14,7 +14,7 @@ let api_key;
 let board_id;
 
 /** SET GLOBAL VARIABLES **/
-const setGlobalsVariables = () => {
+const setGlobalVariables = () => {
   globalVars = verifyUser.exportGlobals();
   user_id = globalVars.user_id;
   github_handle = globalVars.github_handle;
@@ -38,7 +38,7 @@ let displayAllPanelTicketsTable = new Table({
 /** DISPLAY ALL TICKETS OF ASSOCIATED PANEL **/
 const displayAllPanelTickets = () => {
   
-  !globalVars ? setGlobalsVariables() : '';
+  !globalVars ? setGlobalVariables() : '';
 
   prompt(promptForPanelNameQuestion)
     .then(answer => {
