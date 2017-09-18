@@ -1,20 +1,28 @@
-let commandPrompts = require('./commandPrompts.js');
-let MyTickets = require('./actions/MyTickets');
-let PanelTickets = require('./actions/PanelTickets');
-let MyPanelTickets = require('./actions/MyPanelTickets');
+const commandPrompts = require('./commandPrompts.js');
+const MyTickets = require('./actions/MyTickets');
+const PanelTickets = require('./actions/PanelTickets');
+const MyPanelTickets = require('./actions/MyPanelTickets');
+const displayPanels = require('./actions/displayPanels');
 
 /** SWITCH STATEMENT TO IDENTIFY THE COMMAND TO RUN BASED ON USER INPUT **/
-let commandRunner = (command) => {
+const commandRunner = (command) => {
   switch (command) {
+    case 'Display Panels':
+      return displayPanels.displayBoardPanels();
     case 'Display Tickets':
       return commandPrompts.ticketDisplayCommandPrompt();
+    case 'Create Ticket':
+      return commandPrompts.createTicketPrompt();
+    case 'Edit Ticket':
+      return commandPrompts.updateTicketPrompt();
     default:
       console.log('That operation does not exist! Try again!');
+      commandPrompts.commandPrompt();
   };
 };
 
 /** SWITCH STATEMENT SPECIFICALLY FOR TICKET DISPLAY OPTIONS **/
-let ticketDisplayCommandRunner = (command) => {
+const ticketDisplayCommandRunner = (command) => {
   switch (command) {
     case 'Display My Tickets':
       return MyTickets.displayAllMyTickets();

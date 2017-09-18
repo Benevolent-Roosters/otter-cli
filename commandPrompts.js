@@ -1,6 +1,24 @@
 const inquirer = require('inquirer');
 const prompt = inquirer.createPromptModule();
-let runner = require('./commandRunners.js');
+const runner = require('./commandRunners.js');
+const createTicket = require('./actions/createTicket');
+const updateTicket = require('./actions/updateTicket');
+let verifyUser = require('./actions/verifyUser');
+
+/** GLOBAL VARIABLES **/
+
+let globalVars;
+let user_id;
+let github_handle;
+let board_id;
+
+/** SET GLOBAL VARIABLES **/
+const setGlobalVariables = () => {
+  globalVars = verifyUser.exportGlobals();
+  user_id = globalVars.user_id;
+  github_handle = globalVars.github_handle;
+  board_id = globalVars.board_id;
+}
 
 /** VERIFY INITIAL COMMAND PROMPT QUESTION INFO **/
 const commandPromptQuestions = {
@@ -19,7 +37,7 @@ const commandDisplayTicketsOptions = {
 };
 
 /** TAKE IN USER INPUTTED COMMAND AND PASS THROUGH SWITCH STATEMENT **/
-let commandPrompt = () => {
+module.exports.commandPrompt = () => {
   prompt(commandPromptQuestions)
     .then(answers => {
       runner.commandRunner(answers.command);
@@ -32,7 +50,7 @@ let commandPrompt = () => {
 };
 
 /** TAKE USER INPUTTED DISPLAY TICKET COMMAND AND PASS THROUGH SWITCH STATEMENT **/
-let ticketDisplayCommandPrompt = () => {
+module.exports.ticketDisplayCommandPrompt = () => {
   prompt(commandDisplayTicketsOptions)
     .then(answers => {
       runner.ticketDisplayCommandRunner(answers.displayTicketsOptions);
@@ -44,5 +62,111 @@ let ticketDisplayCommandPrompt = () => {
     })
 };
 
-module.exports.commandPrompt = commandPrompt;
-module.exports.ticketDisplayCommandPrompt = ticketDisplayCommandPrompt;
+/** BUILD NEW TICKET OBJECT FROM USER INPUT **/
+module.exports.createTicketPrompt = () => {
+  !globalVars ? setGlobalVariables() : '';
+  let newTicket = {creator_id: user_id};
+  prompt({type: 'input', name: 'ticketPanel', message: 'Panel ID:'})
+    .then(answer => {
+      newTicket.panel_id = answer.ticketPanel;
+      return prompt({type: 'input', name: 'ticketTitle', message: 'Title:'})
+    })
+    .then(answer => {
+      newTicket.title = answer.ticketTitle;
+      return prompt({type: 'input', name: 'ticketDescription', message: 'Description:'})
+    })
+    .then(answer => {
+      newTicket.description = answer.ticketDescription;
+      return prompt({type: 'input', name: 'ticketType', message: 'Type:'})
+    })
+    .then(answer => {
+      newTicket.type = answer.ticketType;
+      return prompt({type: 'list', name: 'ticketStatus', message: 'Status:', choices: ['not started', 'in progress', 'complete']})
+    })
+    .then(answer => {
+      newTicket.status = answer.ticketStatus;
+      return prompt({type: 'list', name: 'ticketPriority', message: 'Priority:', choices: ['1', '2', '3']})
+    })
+    .then(answer => {
+      newTicket.priority = parseInt(answer.ticketPriority);
+      return prompt({type: 'input', name: 'ticketAssignee', message: 'Assignee Handle:', default: github_handle})
+    })
+    .then(answer => {
+      newTicket.assignee_handle = answer.ticketAssignee;
+      return prompt({type: 'confirm', name: 'ticketConfirm', message: 'Everything above look okay?'})
+    })
+    .then(answer => {
+      if (answer.ticketConfirm) {
+        createTicket.createTicket(newTicket);
+      }
+      if (!answer.ticketConfirm) {
+        console.log('Ticket abandoned! Sad!')
+        commandPrompt();
+      }
+    })
+
+  .catch(error => {
+    console.log('ERROR', error);
+    commandPrompt();
+  })
+}
+
+/** BUILD NEW TICKET OBJECT FROM USER INPUT **/
+module.exports.updateTicketPrompt = () => {
+  !globalVars ? setGlobalVariables() : '';
+  let newTicket = {};
+  let oldTicket;
+
+  prompt({type: 'input', name: 'ticketId', message: 'Ticket ID:'})
+    .then(answer => {
+      newTicket.id = answer.ticketId;
+      return updateTicket.fetchTicket(answer.ticketId);
+      // console.log(updateTicket.fetchTicket(answer.ticketId))
+    })
+    .then(ticket => {
+      oldTicket = ticket;
+      return prompt({type: 'input', name: 'ticketPanel', message: 'Panel ID:', default: oldTicket.panel_id})
+    })
+    .then(answer => {
+      newTicket.panel_id = answer.ticketPanel;
+      return prompt({type: 'input', name: 'ticketTitle', message: 'Title:', default: oldTicket.title})
+    })
+    .then(answer => {
+      newTicket.title = answer.ticketTitle;
+      return prompt({type: 'input', name: 'ticketDescription', message: 'Description:', default: oldTicket.description})
+    })
+    .then(answer => {
+      newTicket.description = answer.ticketDescription;
+      return prompt({type: 'input', name: 'ticketType', message: 'Type:', default: oldTicket.type})
+    })
+    .then(answer => {
+      newTicket.type = answer.ticketType;
+      return prompt({type: 'list', name: 'ticketStatus', message: 'Status:', choices: ['not started', 'in progress', 'complete'], default: oldTicket.status})
+    })
+    .then(answer => {
+      newTicket.status = answer.ticketStatus;
+      return prompt({type: 'list', name: 'ticketPriority', message: 'Priority:', choices: ['1', '2', '3'], default: oldTicket.priority})
+    })
+    .then(answer => {
+      newTicket.priority = parseInt(answer.ticketPriority);
+      return prompt({type: 'input', name: 'ticketAssignee', message: 'Assignee Handle:', default: github_handle, default: oldTicket.assignee_handle})
+    })
+    .then(answer => {
+      newTicket.assignee_handle = answer.ticketAssignee;
+      return prompt({type: 'confirm', name: 'ticketConfirm', message: 'Everything above look okay?'})
+    })
+    .then(answer => {
+      if (answer.ticketConfirm) {
+        updateTicket.updateTicket(newTicket);
+      }
+      if (!answer.ticketConfirm) {
+        console.log('Ticket abandoned! Sad!')
+        commandPrompt();
+      }
+    })
+
+  .catch(error => {
+    console.log('ERROR', error);
+    commandPrompt();
+  })
+}
