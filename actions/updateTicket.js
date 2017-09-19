@@ -6,7 +6,6 @@ let commandPrompts = require('../commandPrompts');
 let verifyUser = require('../actions/verifyUser');
 
 /** GLOBAL VARIABLES **/
-
 let globalVars;
 let user_id;
 let api_key;
@@ -20,6 +19,7 @@ const setGlobalVariables = () => {
   board_id = globalVars.board_id;
 }
 
+/** FETCH TICKET FOR UPDATING **/
 module.exports.fetchTicket = (ticketId) => {
 
   !globalVars ? setGlobalVariables() : '';
@@ -34,7 +34,7 @@ module.exports.fetchTicket = (ticketId) => {
     })
 }
 
-/** GRAB A WHOLE SATCHEL OF PANELS USING A MIX OF JAVASCRIPT AND SPELLS **/
+/** RETURN UPDATED TICKET **/
 module.exports.updateTicket = (ticketObj) => {
 
   !globalVars ? setGlobalVariables() : '';
@@ -44,7 +44,7 @@ module.exports.updateTicket = (ticketObj) => {
 
   return axios.post('http://localhost:3000/cli/ticket', ticketObj)
     .then((response) => {
-      console.log(`Ticket ${response.data.title} saved!`);
+      console.log(`Ticket ${response.data.title} updated!`);
     })
     .catch((error) => {
       console.log('ERROR UPDATING TICKET: ', error.response.data);

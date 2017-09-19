@@ -15,6 +15,8 @@ const commandRunner = (command) => {
       return commandPrompts.createTicketPrompt();
     case 'Edit Ticket':
       return commandPrompts.updateTicketPrompt();
+    case 'Close Ticket':
+      return commandPrompts.closeTicketPrompt();
     default:
       console.log('That operation does not exist! Try again!');
       commandPrompts.commandPrompt();
