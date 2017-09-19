@@ -2,11 +2,10 @@ const axios = require('axios');
 const Table = require('cli-table2');
 const inquirer = require('inquirer');
 const prompt = inquirer.createPromptModule();
-let commandPrompts = require('../commandPrompts');
-let verifyUser = require('../actions/verifyUser');
+const commandPrompts = require('../commandPrompts');
+const verifyUser = require('../actions/verifyUser');
 
 /** GLOBAL VARIABLES **/
-
 let globalVars;
 let user_id;
 let github_handle;
@@ -29,16 +28,16 @@ const promptForPanelNameQuestion = {
   message: "What is the panel'\s id?"
 };
 
-/** TABLE DISPLAY FOR displayAllPanelTickets() **/
-let displayAllPanelTicketsTable = new Table({
-  head: ['Ticket_id', 'Title', 'Description', 'Status', 'Priority', 'Type', 'Assignee_handle', 'Panel_id'], 
-  colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
-});
-
 /** DISPLAY ALL TICKETS OF ASSOCIATED PANEL **/
 const displayAllPanelTickets = () => {
   
   !globalVars ? setGlobalVariables() : '';
+
+  /** TABLE DISPLAY FOR displayAllPanelTickets() **/
+  let displayAllPanelTicketsTable = new Table({
+    head: ['Ticket_id', 'Title', 'Description', 'Status', 'Priority', 'Type', 'Assignee_handle', 'Panel_id'], 
+    colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
+  });
 
   prompt(promptForPanelNameQuestion)
     .then(answer => {

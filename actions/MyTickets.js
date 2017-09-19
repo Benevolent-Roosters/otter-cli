@@ -1,10 +1,9 @@
 const axios = require('axios');
 const Table = require('cli-table2');
-let commandPrompts = require('../commandPrompts');
-let verifyUser = require('../actions/verifyUser');
+const commandPrompts = require('../commandPrompts');
+const verifyUser = require('../actions/verifyUser');
 
 /** GLOBAL VARIABLES **/
-
 let globalVars;
 let user_id;
 let github_handle;
@@ -20,16 +19,16 @@ const setGlobalVariables = () => {
   board_id = globalVars.board_id;
 }
 
-/** TABLE DISPLAY FOR displayAllMyTickets() **/
-let displayAllMyTicketsTable = new Table({
-  head: ['Ticket_id', 'Title', 'Description', 'Status', 'Priority', 'Type', 'Assignee_handle', 'Panel_id'], 
-  colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
-});
-
 /** DISPLAY ALL MY TICKETS **/
 const displayAllMyTickets = () => {
 
   !globalVars ? setGlobalVariables() : '';
+  
+  /** TABLE DISPLAY FOR displayAllMyTickets() **/
+  let displayAllMyTicketsTable = new Table({
+    head: ['Ticket_id', 'Title', 'Description', 'Status', 'Priority', 'Type', 'Assignee_handle', 'Panel_id'], 
+    colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
+  });
   
   axios.get('http://localhost:3000/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle }})
     .then(tickets => {

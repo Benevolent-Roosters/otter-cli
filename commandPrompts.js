@@ -3,10 +3,9 @@ const prompt = inquirer.createPromptModule();
 const runner = require('./commandRunners.js');
 const createTicket = require('./actions/createTicket');
 const updateTicket = require('./actions/updateTicket');
-let verifyUser = require('./actions/verifyUser');
+const verifyUser = require('./actions/verifyUser');
 
 /** GLOBAL VARIABLES **/
-
 let globalVars;
 let user_id;
 let github_handle;
@@ -25,7 +24,7 @@ const commandPromptQuestions = {
   type: 'list',
   name: 'command',
   message: 'What operation do you want to perform next?',
-  choices: ['Display Panels', 'Display Tickets', 'Create Ticket', 'Edit Ticket']
+  choices: ['Display Panels', 'Display Tickets', 'Create Ticket', 'Edit Ticket', 'Close Ticket']
 };
 
 /** VERIFY DISPLAY TICKET COMMAND PROMPT QUESTION INFO **/
@@ -37,7 +36,7 @@ const commandDisplayTicketsOptions = {
 };
 
 /** TAKE IN USER INPUTTED COMMAND AND PASS THROUGH SWITCH STATEMENT **/
-module.exports.commandPrompt = () => {
+const commandPrompt = () => {
   prompt(commandPromptQuestions)
     .then(answers => {
       runner.commandRunner(answers.command);
@@ -57,7 +56,7 @@ module.exports.ticketDisplayCommandPrompt = () => {
     })
 
     .catch(error => {
-      console.log('ERROR');
+      console.log('There was an error with this command! Try again');
       commandPrompt();
     })
 };
@@ -77,7 +76,7 @@ module.exports.createTicketPrompt = () => {
     })
     .then(answer => {
       newTicket.description = answer.ticketDescription;
-      return prompt({type: 'input', name: 'ticketType', message: 'Type:'})
+      return prompt({type: 'list', name: 'ticketType', message: 'Type:', choices: ['bug', 'devops', 'feature']})
     })
     .then(answer => {
       newTicket.type = answer.ticketType;
@@ -101,17 +100,17 @@ module.exports.createTicketPrompt = () => {
       }
       if (!answer.ticketConfirm) {
         console.log('Ticket abandoned! Sad!')
-        commandPrompt();
+        module.exports.commandPrompt();
       }
     })
 
   .catch(error => {
-    console.log('ERROR', error);
+    console.log('ERROR creating ticket: ', error);
     commandPrompt();
   })
 }
 
-/** BUILD NEW TICKET OBJECT FROM USER INPUT **/
+/** BUILD NEW TICKET OBJECT FROM USER INPUT; USE ORIGINAL TICKET VALUES AS DEFAULTS **/
 module.exports.updateTicketPrompt = () => {
   !globalVars ? setGlobalVariables() : '';
   let newTicket = {};
@@ -137,7 +136,7 @@ module.exports.updateTicketPrompt = () => {
     })
     .then(answer => {
       newTicket.description = answer.ticketDescription;
-      return prompt({type: 'input', name: 'ticketType', message: 'Type:', default: oldTicket.type})
+      return prompt({type: 'list', name: 'ticketType', message: 'Type:', choices: ['bug', 'devops', 'feature'], default: oldTicket.type})
     })
     .then(answer => {
       newTicket.type = answer.ticketType;
@@ -166,7 +165,35 @@ module.exports.updateTicketPrompt = () => {
     })
 
   .catch(error => {
-    console.log('ERROR', error);
+    console.log('ERROR updating ticket: ', error);
     commandPrompt();
   })
 }
+
+module.exports.closeTicketPrompt = () => {
+
+  !globalVars ? setGlobalVariables() : '';
+
+  prompt({type: 'input', name: 'ticketId', message: 'Ticket ID:'})
+    .then(answer => {
+      return updateTicket.fetchTicket(answer.ticketId);
+    })
+    .then(ticket => {
+      if (ticket.status === 'complete') {
+        throw 'Ticket already closed!'
+      }
+      // delete updated_at field to prevent rejection by server
+      delete ticket.updated_at;
+      ticket.status = 'complete';
+      return updateTicket.updateTicket(ticket);
+    })
+    .then(() => {
+      return commandPrompt();
+    })
+    .catch(error => {
+      console.log('ERROR closing ticket: ', error);
+      commandPrompt();
+    })
+}
+
+module.exports.commandPrompt = commandPrompt;

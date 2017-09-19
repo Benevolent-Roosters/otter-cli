@@ -3,8 +3,7 @@ const inquirer = require('inquirer');
 const prompt = inquirer.createPromptModule();
 const readJson = require('read-package-json');
 const Promise = require('bluebird');
-
-let commandPrompts = require('../commandPrompts');
+const commandPrompts = require('../commandPrompts.js');
 
 /** GLOBAL VARIABLES **/
 let user_id;
