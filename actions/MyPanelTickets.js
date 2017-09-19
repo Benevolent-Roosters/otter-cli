@@ -41,20 +41,18 @@ const displayAllMyPanelTickets = () => {
 
   prompt(promptForPanelNameQuestion)
     .then(answer => {
-      axios.get('http://localhost:3000/cli/mypaneltickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle, panel_id: answer.panel_id }})
-        .then(tickets => {
+      axios.get('http://localhost:3000/cli/mypaneltickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle, panel_id: answer.panel_id}})
 
+        .then(tickets => {
           tickets.data.forEach(ticket => {
             displayAllMyPanelTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
           });
-    
           console.log(displayAllMyPanelTicketsTable.toString());
           commandPrompts.commandPrompt();
         })
-
+        
         .catch(error => {
-          console.log('Error on getting Tickets for this Panel!');
-          console.log(displayAllMyPanelTicketsTable.toString());
+          console.log('Error displaying tickets: ', error.response.data);
           commandPrompts.commandPrompt();
         });
     });

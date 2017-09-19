@@ -2,11 +2,10 @@ const axios = require('axios');
 const Table = require('cli-table2');
 const inquirer = require('inquirer');
 const prompt = inquirer.createPromptModule();
-let commandPrompts = require('../commandPrompts');
-let verifyUser = require('../actions/verifyUser');
+const commandPrompts = require('../commandPrompts');
+const verifyUser = require('../actions/verifyUser');
 
 /** GLOBAL VARIABLES **/
-
 let globalVars;
 let user_id;
 let github_handle;
@@ -22,8 +21,6 @@ const setGlobalVariables = () => {
   board_id = globalVars.board_id;
 }
 
-
-/** GRAB A WHOLE SATCHEL OF PANELS USING A MIX OF JAVASCRIPT AND SPELLS **/
 const displayBoardPanels = () => {
 
   !globalVars ? setGlobalVariables() : '';
@@ -34,17 +31,18 @@ const displayBoardPanels = () => {
   });
 
   axios.get('http://localhost:3000/cli/panels', {params: {api_key: api_key, board_id: board_id}})
+
     .then(panels => {
       panels.data.forEach((panel) => {
+        // Display date portion of timestamp only
         displayBoardPanelsTable.push([panel.id, panel.name, panel.due_date.slice(0, 10)]);
       });
-      let options = displayBoardPanelsTable.options;
       console.log(displayBoardPanelsTable.toString());
       commandPrompts.commandPrompt();
     })
-
+    
     .catch(error => {
-      console.log('Error displaying panels', error);
+      console.log('Error displaying panels: ', error.response.data);
     });
 }
 

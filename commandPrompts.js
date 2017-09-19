@@ -23,7 +23,7 @@ const setGlobalVariables = () => {
 const commandPromptQuestions = {
   type: 'list',
   name: 'command',
-  message: 'What operation do you want to perform next?',
+  message: 'Select an operation',
   choices: ['Display Panels', 'Display Tickets', 'Create Ticket', 'Edit Ticket', 'Close Ticket']
 };
 
@@ -31,7 +31,7 @@ const commandPromptQuestions = {
 const commandDisplayTicketsOptions = {
   type: 'list',
   name: 'displayTicketsOptions',
-  message: 'Choose a category to perform an action',
+  message: 'Select a display option',
   choices: ['Display My Tickets', 'Display Panel Tickets', 'Display My Panel Tickets']
 };
 
@@ -43,7 +43,7 @@ const commandPrompt = () => {
     })
 
     .catch(error => {
-      console.log('There was an error with this command! Try again');
+      console.log('There was an error with this command: ', error);
       commandPrompt();
     })
 };
@@ -56,7 +56,7 @@ module.exports.ticketDisplayCommandPrompt = () => {
     })
 
     .catch(error => {
-      console.log('There was an error with this command! Try again');
+      console.log('There was an error with this command: ', error);
       commandPrompt();
     })
 };
@@ -92,7 +92,7 @@ module.exports.createTicketPrompt = () => {
     })
     .then(answer => {
       newTicket.assignee_handle = answer.ticketAssignee;
-      return prompt({type: 'confirm', name: 'ticketConfirm', message: 'Everything above look okay?'})
+      return prompt({type: 'confirm', name: 'ticketConfirm', message: 'Everything look okay?'})
     })
     .then(answer => {
       if (answer.ticketConfirm) {
@@ -100,12 +100,12 @@ module.exports.createTicketPrompt = () => {
       }
       if (!answer.ticketConfirm) {
         console.log('Ticket abandoned! Sad!')
-        module.exports.commandPrompt();
+        commandPrompt();
       }
     })
 
   .catch(error => {
-    console.log('ERROR creating ticket: ', error);
+    console.log('Error creating ticket: ', error);
     commandPrompt();
   })
 }
@@ -120,7 +120,6 @@ module.exports.updateTicketPrompt = () => {
     .then(answer => {
       newTicket.id = answer.ticketId;
       return updateTicket.fetchTicket(answer.ticketId);
-      // console.log(updateTicket.fetchTicket(answer.ticketId))
     })
     .then(ticket => {
       oldTicket = ticket;
@@ -152,7 +151,7 @@ module.exports.updateTicketPrompt = () => {
     })
     .then(answer => {
       newTicket.assignee_handle = answer.ticketAssignee;
-      return prompt({type: 'confirm', name: 'ticketConfirm', message: 'Everything above look okay?'})
+      return prompt({type: 'confirm', name: 'ticketConfirm', message: 'Everything look okay?'})
     })
     .then(answer => {
       if (answer.ticketConfirm) {
@@ -165,7 +164,7 @@ module.exports.updateTicketPrompt = () => {
     })
 
   .catch(error => {
-    console.log('ERROR updating ticket: ', error);
+    console.log('Error updating ticket: ', error);
     commandPrompt();
   })
 }
@@ -187,11 +186,8 @@ module.exports.closeTicketPrompt = () => {
       ticket.status = 'complete';
       return updateTicket.updateTicket(ticket);
     })
-    .then(() => {
-      return commandPrompt();
-    })
     .catch(error => {
-      console.log('ERROR closing ticket: ', error);
+      console.log('Error closing ticket: ', error);
       commandPrompt();
     })
 }
