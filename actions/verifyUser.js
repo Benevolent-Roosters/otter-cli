@@ -25,7 +25,7 @@ const verifyAPIKeyQuestions = {
 /** VERIFY USER INPUTTED API KEY **/
 const verifyAPIKey = () => {
   prompt(verifyAPIKeyQuestions).then(answers => {
-    axios.get('http://localhost:3000/cli/api_key', {params: answers})
+    axios.get('http://localhost:3000/cli/api_key', {params: {api_key: answers.api_key}})
     .then(response => {
       user_id = response.data.id;
       github_handle = response.data.github_handle;

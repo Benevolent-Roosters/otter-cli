@@ -12,7 +12,7 @@ let api_key;
 let board_id;
 
 /** SET GLOBAL VARIABLES **/
-const setGlobalsVariables = () => {
+const setGlobalVariables = () => {
   globalVars = verifyUser.exportGlobals();
   user_id = globalVars.user_id;
   github_handle = globalVars.github_handle;
@@ -29,7 +29,7 @@ let displayAllMyTicketsTable = new Table({
 /** DISPLAY ALL MY TICKETS **/
 const displayAllMyTickets = () => {
 
-  !globalVars ? setGlobalsVariables() : '';
+  !globalVars ? setGlobalVariables() : '';
   
   axios.get('http://localhost:3000/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle }})
     .then(tickets => {
@@ -50,3 +50,4 @@ const displayAllMyTickets = () => {
 }
 
 module.exports.displayAllMyTickets = displayAllMyTickets;
+module.exports.displayAllMyTicketsTable = displayAllMyTicketsTable;
