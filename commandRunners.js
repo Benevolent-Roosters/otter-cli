@@ -33,7 +33,8 @@ const ticketDisplayCommandRunner = (command) => {
     case 'Display My Panel Tickets':
       return MyPanelTickets.displayAllMyPanelTickets();
     default:
-      console.log('Something went wrong when displaying tickets!')
+      console.log('Something went wrong when loading ticket display options!')
+      commandPrompts.commandPrompt();
   }
 };
 

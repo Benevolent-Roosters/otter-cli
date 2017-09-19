@@ -29,7 +29,7 @@ module.exports.fetchTicket = (ticketId) => {
       return ticket.data;
     })
     .catch((error) => {
-      console.log('ERROR FETCHING TICKET: ', error.response.data);
+      console.log('Error fetching ticket: ', error.response.data);
       commandPrompts.commandPrompt();
     })
 }
@@ -45,9 +45,10 @@ module.exports.updateTicket = (ticketObj) => {
   return axios.post('http://localhost:3000/cli/ticket', ticketObj)
     .then((response) => {
       console.log(`Ticket ${response.data.title} updated!`);
+      commandPrompts.commandPrompt();
     })
     .catch((error) => {
-      console.log('ERROR UPDATING TICKET: ', error.response.data);
+      console.log('Error saving ticket: ', error.response.data);
       commandPrompts.commandPrompt();
     });
 }

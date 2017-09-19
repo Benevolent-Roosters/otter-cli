@@ -29,10 +29,10 @@ const verifyAPIKey = () => {
       user_id = response.data.id;
       github_handle = response.data.github_handle;
       api_key = response.data.api_key;
-      grabBoardId()
+      grabBoardId();
     })
     .catch(error => {
-      console.log('error');
+      console.log('Error verifying API key: ', error.response.data);
       verifyAPIKey();
     });
   });
@@ -43,18 +43,17 @@ const grabBoardId = () => {
   readJSON('./package.json', console.error, true)
     .then(response => {
       axios.get('http://localhost:3000/cli/board', {params: {repo_url: 'https://github.com/Benevolent-Roosters/thesis3', api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
+      
         .then(boardInfo => {
           board_id = boardInfo.data.id;
-          console.log('Board Found!');
         })
-
         .then(() => {
           exportGlobals();
           commandPrompts.commandPrompt(); //if board successfully grabbed, initiate command prompt
         })
 
         .catch(error => {
-          console.log('ERROR grabbing board id with repo url:', error.data);
+          console.log('Error fetching board: ', error.response.data);
           verifyAPIKey();
         })
     });
@@ -65,8 +64,6 @@ const exportGlobals = () => {
   return {user_id: user_id, github_handle: github_handle, api_key: api_key, board_id: board_id};
 };
 
-
 module.exports.verifyAPIKey = verifyAPIKey;
 module.exports.grabBoardId = grabBoardId;
 module.exports.exportGlobals = exportGlobals;
-

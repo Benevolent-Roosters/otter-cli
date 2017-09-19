@@ -30,20 +30,18 @@ const displayAllMyTickets = () => {
     colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
   });
   
-  axios.get('http://localhost:3000/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle }})
-    .then(tickets => {
+  axios.get('http://localhost:3000/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle}})
 
+    .then(tickets => {
       tickets.data.forEach(ticket => {
         displayAllMyTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
       });
-
       console.log(displayAllMyTicketsTable.toString());
       commandPrompts.commandPrompt();
     })
-
+    
     .catch(error => {
-      console.log('Error displaying all tickets');      
-      console.log(displayAllMyTicketsTable.toString());
+      console.log('Error displaying tickets: ', error.response.data);
       commandPrompts.commandPrompt();
     });
 }
