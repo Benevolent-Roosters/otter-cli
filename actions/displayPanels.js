@@ -22,21 +22,23 @@ const setGlobalVariables = () => {
   board_id = globalVars.board_id;
 }
 
-let displayBoardPanelsTable = new Table({
-  head: ['id', 'name', 'due_date'], 
-  colWidths: [5, 20, 15]
-});
 
 /** GRAB A WHOLE SATCHEL OF PANELS USING A MIX OF JAVASCRIPT AND SPELLS **/
 const displayBoardPanels = () => {
 
   !globalVars ? setGlobalVariables() : '';
 
+  let displayBoardPanelsTable = new Table({
+    head: ['id', 'name', 'due_date'], 
+    colWidths: [5, 20, 15]
+  });
+
   axios.get('http://localhost:3000/cli/panels', {params: {api_key: api_key, board_id: board_id}})
     .then(panels => {
       panels.data.forEach((panel) => {
         displayBoardPanelsTable.push([panel.id, panel.name, panel.due_date.slice(0, 10)]);
       });
+      let options = displayBoardPanelsTable.options;
       console.log(displayBoardPanelsTable.toString());
       commandPrompts.commandPrompt();
     })

@@ -18,7 +18,4 @@ app.listen(PORT, () => {
   
   verifyUser.verifyAPIKey();
 
-  // uncomment before going public, presenting to VCs
-  // grabBoardId();
-
 })
