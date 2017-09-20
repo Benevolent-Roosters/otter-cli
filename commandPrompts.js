@@ -4,6 +4,10 @@ const runner = require('./commandRunners.js');
 const createTicket = require('./actions/createTicket');
 const updateTicket = require('./actions/updateTicket');
 const verifyUser = require('./actions/verifyUser');
+const Panels = require('./actions/Panels');
+const MyTickets = require('./actions/MyTickets');
+const PanelTickets = require('./actions/PanelTickets');
+const MyPanelTickets = require('./actions/MyPanelTickets');
 
 /** GLOBAL VARIABLES **/
 let globalVars;
@@ -61,11 +65,35 @@ module.exports.ticketDisplayCommandPrompt = () => {
     })
 };
 
+module.exports.panelTicketsPrompt = () => {
+  Panels.fetchBoardPanels()
+    .then((panels) => {
+      return prompt({type: 'list', name: 'ticketPanel', message: 'Select Panel:', choices: panels.map((panel) => `${panel.id}| ${panel.name}`)})
+    })
+    .then(answer => {
+      PanelTickets.displayAllPanelTickets(answer.ticketPanel.split('|')[0]);
+    })
+}
+
+module.exports.myPanelTicketsPrompt = () => {
+  Panels.fetchBoardPanels()
+    .then((panels) => {
+      return prompt({type: 'list', name: 'ticketPanel', message: 'Select Panel:', choices: panels.map((panel) => `${panel.id}| ${panel.name}`)})
+    })
+    .then(answer => {
+      MyPanelTickets.displayMyPanelTickets(answer.ticketPanel.split('|')[0]);
+    })
+}
+
 /** BUILD NEW TICKET OBJECT FROM USER INPUT **/
 module.exports.createTicketPrompt = () => {
   !globalVars ? setGlobalVariables() : '';
   let newTicket = {creator_id: user_id};
-  prompt({type: 'input', name: 'ticketPanel', message: 'Panel ID:'})
+
+  Panels.fetchBoardPanels()
+    .then((panels) => {
+      return prompt({type: 'list', name: 'ticketPanel', message: 'Select Panel:', choices: panels.map((panel) => panel.name)})
+    })
     .then(answer => {
       newTicket.panel_id = answer.ticketPanel;
       return prompt({type: 'input', name: 'ticketTitle', message: 'Title:'})
@@ -123,10 +151,6 @@ module.exports.updateTicketPrompt = () => {
     })
     .then(ticket => {
       oldTicket = ticket;
-      return prompt({type: 'input', name: 'ticketPanel', message: 'Panel ID:', default: oldTicket.panel_id})
-    })
-    .then(answer => {
-      newTicket.panel_id = answer.ticketPanel;
       return prompt({type: 'input', name: 'ticketTitle', message: 'Title:', default: oldTicket.title})
     })
     .then(answer => {
@@ -183,6 +207,7 @@ module.exports.closeTicketPrompt = () => {
       }
       // delete updated_at field to prevent rejection by server
       delete ticket.updated_at;
+      delete ticket.created_at;
       ticket.status = 'complete';
       return updateTicket.updateTicket(ticket);
     })
