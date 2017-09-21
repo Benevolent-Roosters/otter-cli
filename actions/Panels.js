@@ -4,6 +4,7 @@ const inquirer = require('inquirer');
 const prompt = inquirer.createPromptModule();
 const commandPrompts = require('../commandPrompts');
 const verifyUser = require('../actions/verifyUser');
+const Promise = require('bluebird');
 
 /** GLOBAL VARIABLES **/
 let globalVars;
@@ -21,29 +22,47 @@ const setGlobalVariables = () => {
   board_id = globalVars.board_id;
 }
 
-const displayBoardPanels = () => {
+const fetchBoardPanels = () => {
 
   !globalVars ? setGlobalVariables() : '';
+
+  return axios.get('http://localhost:3000/cli/panels', {params: {api_key: api_key, board_id: board_id, user_id: user_id}})
+
+    .then(panels => {
+      if (panels.data.length === 0) {
+        console.log('No panels found for this board!');
+        commandPrompts.commandPrompt();
+      } else {
+        return panels.data;
+      }
+    })
+    
+    .catch(error => {
+      console.log('Error fetching panels: ', error.response.data);
+    });
+
+}
+
+const displayBoardPanels = () => {
 
   let displayBoardPanelsTable = new Table({
     head: ['id', 'name', 'due_date'], 
     colWidths: [5, 20, 15]
   });
 
-  axios.get('http://localhost:3000/cli/panels', {params: {api_key: api_key, board_id: board_id}})
-
-    .then(panels => {
-      panels.data.forEach((panel) => {
+  return fetchBoardPanels()
+    .then((panels) => {
+      panels.forEach((panel) => {
         // Display date portion of timestamp only
         displayBoardPanelsTable.push([panel.id, panel.name, panel.due_date.slice(0, 10)]);
       });
-      console.log(displayBoardPanelsTable.toString());
-      commandPrompts.commandPrompt();
+      return console.log(displayBoardPanelsTable.toString());
     })
-    
-    .catch(error => {
-      console.log('Error displaying panels: ', error.response.data);
-    });
-}
+    .then(() => {
+      return commandPrompts.commandPrompt();
+    })
+
+};
 
 module.exports.displayBoardPanels = displayBoardPanels;
+module.exports.fetchBoardPanels = fetchBoardPanels;

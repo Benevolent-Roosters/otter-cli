@@ -1,7 +1,6 @@
 const axios = require('axios');
 const Table = require('cli-table2');
 const inquirer = require('inquirer');
-const prompt = inquirer.createPromptModule();
 const commandPrompts = require('../commandPrompts');
 const verifyUser = require('../actions/verifyUser');
 
@@ -25,6 +24,7 @@ const createTicket = (ticketObj) => {
 
   ticketObj.api_key = api_key;
   ticketObj.board_id = board_id;
+  ticketObj.user_id = user_id;
 
   return axios.post('http://localhost:3000/cli/tickets', ticketObj)
     .then((response) => {

@@ -21,15 +21,8 @@ const setGlobalVariables = () => {
   board_id = globalVars.board_id;
 }
 
-/** PROMPT FOR PANEL NAME (USED FOR displayAllPanelTickets() AND displayAllMyPanelTickets()) **/
-const promptForPanelNameQuestion = {
-  type: 'input',
-  name: 'panel_id',
-  message: "What is the panel'\s id?"
-};
-
 /** DISPLAY ALL OF USER'S TICKETS ASSOCIATED WITH A PANEL **/
-const displayAllMyPanelTickets = () => {
+const displayMyPanelTickets = (panelId) => {
 
   !globalVars ? setGlobalVariables() : '';
 
@@ -39,23 +32,25 @@ const displayAllMyPanelTickets = () => {
     colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
   });
 
-  prompt(promptForPanelNameQuestion)
-    .then(answer => {
-      axios.get('http://localhost:3000/cli/mypaneltickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle, panel_id: answer.panel_id}})
+  axios.get('http://localhost:3000/cli/mypaneltickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle, panel_id: panelId}})
 
-        .then(tickets => {
-          tickets.data.forEach(ticket => {
-            displayAllMyPanelTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
-          });
-          console.log(displayAllMyPanelTicketsTable.toString());
-          commandPrompts.commandPrompt();
-        })
-        
-        .catch(error => {
-          console.log('Error displaying tickets: ', error.response.data);
-          commandPrompts.commandPrompt();
+    .then(tickets => {
+      if (tickets.data.length === 0) {
+        console.log('No tickets assigned to you for that panel!')
+        commandPrompts.commandPrompt();
+      } else {
+        tickets.data.forEach(ticket => {
+          displayAllMyPanelTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
         });
+        console.log(displayAllMyPanelTicketsTable.toString());
+        commandPrompts.commandPrompt();
+      }
+    })
+    
+    .catch(error => {
+      console.log('Error displaying tickets: ', error.response.data);
+      commandPrompts.commandPrompt();
     });
 };
 
-module.exports.displayAllMyPanelTickets = displayAllMyPanelTickets;
+module.exports.displayMyPanelTickets = displayMyPanelTickets;

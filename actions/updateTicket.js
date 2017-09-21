@@ -2,8 +2,8 @@ const axios = require('axios');
 const Table = require('cli-table2');
 const inquirer = require('inquirer');
 const prompt = inquirer.createPromptModule();
-let commandPrompts = require('../commandPrompts');
-let verifyUser = require('../actions/verifyUser');
+const commandPrompts = require('../commandPrompts');
+const verifyUser = require('../actions/verifyUser');
 
 /** GLOBAL VARIABLES **/
 let globalVars;
@@ -24,7 +24,7 @@ module.exports.fetchTicket = (ticketId) => {
 
   !globalVars ? setGlobalVariables() : '';
 
-  return axios.get('http://localhost:3000/cli/ticket', {params: {api_key: api_key, id: ticketId}})
+  return axios.get('http://localhost:3000/cli/ticket', {params: {api_key: api_key, id: ticketId, user_id: user_id, board_id: board_id}})
     .then((ticket) => {
       return ticket.data;
     })

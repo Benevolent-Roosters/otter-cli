@@ -1,14 +1,11 @@
 const commandPrompts = require('./commandPrompts.js');
-const MyTickets = require('./actions/MyTickets');
-const PanelTickets = require('./actions/PanelTickets');
-const MyPanelTickets = require('./actions/MyPanelTickets');
-const displayPanels = require('./actions/displayPanels');
+const Panels = require('./actions/Panels');
 
 /** SWITCH STATEMENT TO IDENTIFY THE COMMAND TO RUN BASED ON USER INPUT **/
 const commandRunner = (command) => {
   switch (command) {
     case 'Display Panels':
-      return displayPanels.displayBoardPanels();
+      return Panels.displayBoardPanels();
     case 'Display Tickets':
       return commandPrompts.ticketDisplayCommandPrompt();
     case 'Create Ticket':
@@ -27,11 +24,11 @@ const commandRunner = (command) => {
 const ticketDisplayCommandRunner = (command) => {
   switch (command) {
     case 'Display My Tickets':
-      return MyTickets.displayAllMyTickets();
+      return commandPrompts.myTicketsPrompt();
     case 'Display Panel Tickets':
-      return PanelTickets.displayAllPanelTickets();
+      return commandPrompts.panelTicketsPrompt();
     case 'Display My Panel Tickets':
-      return MyPanelTickets.displayAllMyPanelTickets();
+      return commandPrompts.myPanelTicketsPrompt();
     default:
       console.log('Something went wrong when loading ticket display options!')
       commandPrompts.commandPrompt();
