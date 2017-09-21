@@ -16,7 +16,7 @@ const setGlobalVariables = () => {
   user_id = globalVars.user_id;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 const createTicket = (ticketObj) => {
 
@@ -26,7 +26,7 @@ const createTicket = (ticketObj) => {
   ticketObj.board_id = board_id;
   ticketObj.user_id = user_id;
 
-  return axios.post('http://localhost:3000/cli/tickets', ticketObj)
+  return axios.post('http://localhost:3000/cli/ticket', ticketObj)
     .then((response) => {
       console.log(`Ticket ${response.data.title} ${response.statusText}!`);
       commandPrompts.commandPrompt();
@@ -35,6 +35,6 @@ const createTicket = (ticketObj) => {
       console.log('Error saving ticket: ', error.response.data);
       commandPrompts.commandPrompt();
     });
-}
+};
 
 module.exports.createTicket = createTicket;
