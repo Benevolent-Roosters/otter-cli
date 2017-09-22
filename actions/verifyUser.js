@@ -47,7 +47,7 @@ const verifyAPIKey = () => {
 const grabBoardId = () => {
   readJSON('./package.json', console.error, true)
     .then(response => {
-      axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: repoUrl, api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
+      axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: response.repository.url.slice(4, -4), api_key: api_key, user_id: user_id}})
       
         .then(boardInfo => {
           board_id = boardInfo.data.id;
