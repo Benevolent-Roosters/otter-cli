@@ -15,7 +15,7 @@ Within your package.json, add your Github Repo URL like so:
 }`
 
 ## Usage
-  After installation, open the command line to a repo you've linked to Otter.IO. Run 'otter cli' to initate the CLI.
+  After installation, open the command line to a repo you've linked to Otter.IO. Run 'node index.js' inside the 'otter-cli' folder stored in your node_modules to initate the CLI.
 
 ## Operations
 
