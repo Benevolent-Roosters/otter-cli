@@ -24,7 +24,7 @@ const verifyAPIKeyQuestions = {
 /** VERIFY USER INPUTTED API KEY **/
 const verifyAPIKey = () => {
   prompt(verifyAPIKeyQuestions).then(answers => {
-    axios.get('http://localhost:3000/cli/api_key', {params: answers})
+    axios.get('https://otter-io.herokuapp.com/cli/api_key', {params: answers})
     .then(response => {
       user_id = response.data.id;
       github_handle = response.data.github_handle;
@@ -42,7 +42,7 @@ const verifyAPIKey = () => {
 const grabBoardId = () => {
   readJSON('./package.json', console.error, true)
     .then(response => {
-      axios.get('http://localhost:3000/cli/board', {params: {repo_url: 'https://github.com/Benevolent-Roosters/thesis3', api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
+      axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: 'https://github.com/Benevolent-Roosters/thesis', api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
       
         .then(boardInfo => {
           board_id = boardInfo.data.id;

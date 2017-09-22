@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "otter-test",
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -26,7 +26,6 @@
     "cli-table2": "^0.2.0",
     "express": "^4.15.4",
     "inquirer": "^3.2.3",
-    "nodemon": "^1.12.0",
     "read-package-json": "^2.0.12"
   }
 }

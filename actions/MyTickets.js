@@ -30,7 +30,7 @@ const displayAllMyTickets = () => {
     colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
   });
   
-  axios.get('http://localhost:3000/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle}})
+  axios.get('https://otter-io.herokuapp.com/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle}})
 
     .then(tickets => {
       tickets.data.forEach(ticket => {

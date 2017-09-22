@@ -24,7 +24,7 @@ module.exports.fetchTicket = (ticketId) => {
 
   !globalVars ? setGlobalVariables() : '';
 
-  return axios.get('http://localhost:3000/cli/ticket', {params: {api_key: api_key, id: ticketId, user_id: user_id, board_id: board_id}})
+  return axios.get('https://otter-io.herokuapp.com/cli/ticket', {params: {api_key: api_key, id: ticketId, user_id: user_id, board_id: board_id}})
     .then((ticket) => {
       return ticket.data;
     })
@@ -43,7 +43,7 @@ module.exports.updateTicket = (ticketObj) => {
   ticketObj.board_id = board_id;
   ticketObj.user_id = user_id;
 
-  return axios.put('http://localhost:3000/cli/tickets', ticketObj)
+  return axios.put('https://otter-io.herokuapp.com/cli/tickets', ticketObj)
     .then((response) => {
       console.log(`Ticket ${response.data.title} updated!`);
       commandPrompts.commandPrompt();
