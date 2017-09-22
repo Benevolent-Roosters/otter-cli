@@ -15,7 +15,7 @@ Within your package.json, add your Github Repo URL like so:
 }`
 
 ## Usage
-  After installation, open the command line to a repo you've linked to Otter.IO. Run 'otter cli' to initate the CLI and start editing some boards, ya goof! 
+  After installation, open the command line to a repo you've linked to Otter.IO. Run 'otter cli' to initate the CLI.
 
 ## Operations
 
