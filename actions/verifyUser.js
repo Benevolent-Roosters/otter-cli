@@ -11,12 +11,14 @@ let github_handle;
 let api_key;
 let board_id;
 
+let repoUrl;
+
 /** READ BOARD URL FROM PACKAGE.JSON **/
 const readJSON = Promise.promisify(readJson);
 
 readJSON('../../package.json', console.error, true)
   .then(response => {
-    var repoUrl = response.repository.url.slice(4, -4);
+    repoUrl = response.repository.url.slice(4, -4);
   });
 
 /** VERIFY API KEY PROMPT QUESTION INFO **/
@@ -45,22 +47,19 @@ const verifyAPIKey = () => {
 
 /** GRAB BOARD ID USING GITHUB REPO URL **/
 const grabBoardId = () => {
-  readJSON('./package.json', console.error, true)
-    .then(response => {
-      axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: repoUrl, api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
-      
-        .then(boardInfo => {
-          board_id = boardInfo.data.id;
-        })
-        .then(() => {
-          exportGlobals();
-          commandPrompts.commandPrompt(); //if board successfully grabbed, initiate command prompt
-        })
+  axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: repoUrl, api_key: api_key, user_id: user_id}})
+  
+    .then(boardInfo => {
+      board_id = boardInfo.data.id;
+    })
+    .then(() => {
+      exportGlobals();
+      commandPrompts.commandPrompt(); //if board successfully grabbed, initiate command prompt
+    })
 
-        .catch(error => {
-          console.log('Error fetching board: ', error.response.data);
-          verifyAPIKey();
-        });
+    .catch(error => {
+      console.log('Error fetching board: ', error.response.data);
+      verifyAPIKey();
     });
 };
 
