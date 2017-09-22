@@ -18,7 +18,7 @@ const setGlobalVariables = () => {
   github_handle = globalVars.github_handle;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 /** DISPLAY ALL TICKETS OF ASSOCIATED PANEL **/
 const displayAllPanelTickets = (panelId) => {
@@ -31,25 +31,25 @@ const displayAllPanelTickets = (panelId) => {
     colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
   });
 
-    axios.get('http://localhost:3000/cli/panel/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, panel_id: panelId}})
+  axios.get('https://otter-io.herokuapp.com/cli/panel/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, panel_id: panelId}})
 
-      .then(tickets => {
-        if (tickets.data.length === 0) {
-          console.log('No tickets found for this panel!');
-          commandPrompts.commandPrompt();
-        } else {
-          tickets.data.forEach(ticket => {
-            displayAllPanelTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
-          });
-          console.log(displayAllPanelTicketsTable.toString());
-          commandPrompts.commandPrompt();
-        }
-      })
-
-      .catch(error => {
-        console.log('Error displaying tickets: ', error.response.data);
+    .then(tickets => {
+      if (tickets.data.length === 0) {
+        console.log('No tickets found for this panel!');
         commandPrompts.commandPrompt();
-      });
+      } else {
+        tickets.data.forEach(ticket => {
+          displayAllPanelTicketsTable.push([ticket.id, ticket.title, ticket.description, ticket.status, ticket.priority, ticket.type, ticket.assignee_handle, ticket.panel_id]);
+        });
+        console.log(displayAllPanelTicketsTable.toString());
+        commandPrompts.commandPrompt();
+      }
+    })
+
+    .catch(error => {
+      console.log('Error displaying tickets: ', error.response.data);
+      commandPrompts.commandPrompt();
+    });
 };
 
 module.exports.displayAllPanelTickets = displayAllPanelTickets;

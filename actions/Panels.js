@@ -20,13 +20,13 @@ const setGlobalVariables = () => {
   github_handle = globalVars.github_handle;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 const fetchBoardPanels = () => {
 
   !globalVars ? setGlobalVariables() : '';
 
-  return axios.get('http://localhost:3000/cli/panels', {params: {api_key: api_key, board_id: board_id, user_id: user_id}})
+  return axios.get('https://otter-io.herokuapp.com/cli/panels', {params: {api_key: api_key, board_id: board_id, user_id: user_id}})
 
     .then(panels => {
       if (panels.data.length === 0) {
@@ -41,7 +41,7 @@ const fetchBoardPanels = () => {
       console.log('Error fetching panels: ', error.response.data);
     });
 
-}
+};
 
 const displayBoardPanels = () => {
 
@@ -60,7 +60,7 @@ const displayBoardPanels = () => {
     })
     .then(() => {
       return commandPrompts.commandPrompt();
-    })
+    });
 
 };
 

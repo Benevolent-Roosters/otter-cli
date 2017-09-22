@@ -26,7 +26,7 @@ const createTicket = (ticketObj) => {
   ticketObj.board_id = board_id;
   ticketObj.user_id = user_id;
 
-  return axios.post('http://localhost:3000/cli/ticket', ticketObj)
+  return axios.post('https://otter-io.herokuapp.com/cli/ticket', ticketObj)
     .then((response) => {
       console.log(`Ticket ${response.data.title} ${response.statusText}!`);
       commandPrompts.commandPrompt();

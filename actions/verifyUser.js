@@ -14,6 +14,11 @@ let board_id;
 /** READ BOARD URL FROM PACKAGE.JSON **/
 const readJSON = Promise.promisify(readJson);
 
+readJSON('./package.json', console.error, true)
+  .then(response => {
+    var repoUrl = response.repository.url.slice(4, -4);
+  });
+
 /** VERIFY API KEY PROMPT QUESTION INFO **/
 const verifyAPIKeyQuestions = {
   type: 'input', 
@@ -24,17 +29,17 @@ const verifyAPIKeyQuestions = {
 /** VERIFY USER INPUTTED API KEY **/
 const verifyAPIKey = () => {
   prompt(verifyAPIKeyQuestions).then(answers => {
-    axios.get('http://localhost:3000/cli/api_key', {params: answers})
-    .then(response => {
-      user_id = response.data.id;
-      github_handle = response.data.github_handle;
-      api_key = response.data.api_key;
-      grabBoardId();
-    })
-    .catch(error => {
-      console.log('Error verifying API key: ', error.response.data);
-      verifyAPIKey();
-    });
+    axios.get('https://otter-io.herokuapp.com/cli/api_key', {params: answers})
+      .then(response => {
+        user_id = response.data.id;
+        github_handle = response.data.github_handle;
+        api_key = response.data.api_key;
+        grabBoardId();
+      })
+      .catch(error => {
+        console.log('Error verifying API key: ', error.response.data);
+        verifyAPIKey();
+      });
   });
 };
 
@@ -42,7 +47,7 @@ const verifyAPIKey = () => {
 const grabBoardId = () => {
   readJSON('./package.json', console.error, true)
     .then(response => {
-      axios.get('http://localhost:3000/cli/board', {params: {repo_url: 'https://github.com/Benevolent-Roosters/thesis3', api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
+      axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: repoUrl, api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
       
         .then(boardInfo => {
           board_id = boardInfo.data.id;
@@ -55,9 +60,9 @@ const grabBoardId = () => {
         .catch(error => {
           console.log('Error fetching board: ', error.response.data);
           verifyAPIKey();
-        })
+        });
     });
-}
+};
 
 /** EXPORT GLOBALS **/
 const exportGlobals = () => {
