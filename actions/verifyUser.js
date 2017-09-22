@@ -14,7 +14,7 @@ let board_id;
 /** READ BOARD URL FROM PACKAGE.JSON **/
 const readJSON = Promise.promisify(readJson);
 
-readJSON('./package.json', console.error, true)
+readJSON('../../package.json', console.error, true)
   .then(response => {
     var repoUrl = response.repository.url.slice(4, -4);
   });
