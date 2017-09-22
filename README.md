@@ -3,7 +3,7 @@ Command line interface for use with Otter.IO
 
 ## Installation
 
-`npm install ottercli`
+`npm install otterio-cli`
 
 The CLI will prompt you for an API key, which can be found on your profile page. 
 This can be accessed by clicking on your profile picture in the Otter.IO client.
