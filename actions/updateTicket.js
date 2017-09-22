@@ -17,7 +17,7 @@ const setGlobalVariables = () => {
   user_id = globalVars.user_id;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 /** FETCH TICKET FOR UPDATING **/
 module.exports.fetchTicket = (ticketId) => {
@@ -31,8 +31,8 @@ module.exports.fetchTicket = (ticketId) => {
     .catch((error) => {
       console.log('Error fetching ticket: ', error.response.data);
       commandPrompts.commandPrompt();
-    })
-}
+    });
+};
 
 /** RETURN UPDATED TICKET **/
 module.exports.updateTicket = (ticketObj) => {
@@ -41,8 +41,9 @@ module.exports.updateTicket = (ticketObj) => {
 
   ticketObj.api_key = api_key;
   ticketObj.board_id = board_id;
+  ticketObj.user_id = user_id;
 
-  return axios.post('http://localhost:3000/cli/ticket', ticketObj)
+  return axios.put('http://localhost:3000/cli/tickets', ticketObj)
     .then((response) => {
       console.log(`Ticket ${response.data.title} updated!`);
       commandPrompts.commandPrompt();
@@ -51,4 +52,4 @@ module.exports.updateTicket = (ticketObj) => {
       console.log('Error saving ticket: ', error.response.data);
       commandPrompts.commandPrompt();
     });
-}
+};
