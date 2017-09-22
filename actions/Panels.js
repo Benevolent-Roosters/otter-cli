@@ -20,7 +20,7 @@ const setGlobalVariables = () => {
   github_handle = globalVars.github_handle;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 const fetchBoardPanels = () => {
 
@@ -41,7 +41,7 @@ const fetchBoardPanels = () => {
       console.log('Error fetching panels: ', error.response.data);
     });
 
-}
+};
 
 const displayBoardPanels = () => {
 
@@ -60,7 +60,7 @@ const displayBoardPanels = () => {
     })
     .then(() => {
       return commandPrompts.commandPrompt();
-    })
+    });
 
 };
 

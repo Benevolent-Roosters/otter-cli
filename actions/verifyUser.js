@@ -14,6 +14,11 @@ let board_id;
 /** READ BOARD URL FROM PACKAGE.JSON **/
 const readJSON = Promise.promisify(readJson);
 
+readJSON('./package.json', console.error, true)
+  .then(response => {
+    var repoUrl = response.repository.url.slice(4, -4);
+  });
+
 /** VERIFY API KEY PROMPT QUESTION INFO **/
 const verifyAPIKeyQuestions = {
   type: 'input', 
@@ -42,8 +47,7 @@ const verifyAPIKey = () => {
 const grabBoardId = () => {
   readJSON('./package.json', console.error, true)
     .then(response => {
-      axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: 'https://github.com/Benevolent-Roosters/thesis', api_key: api_key, user_id: user_id}}) //response.repository.url.slice(4, -4)
-      
+      axios.get('https://otter-io.herokuapp.com/cli/board', {params: {repo_url: response.repository.url.slice(4, -4), api_key: api_key, user_id: user_id}}) 
         .then(boardInfo => {
           board_id = boardInfo.data.id;
         })
@@ -55,9 +59,9 @@ const grabBoardId = () => {
         .catch(error => {
           console.log('Error fetching board: ', error.response.data);
           verifyAPIKey();
-        })
+        });
     });
-}
+};
 
 /** EXPORT GLOBALS **/
 const exportGlobals = () => {

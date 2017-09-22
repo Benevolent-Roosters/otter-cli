@@ -17,7 +17,7 @@ const setGlobalVariables = () => {
   github_handle = globalVars.github_handle;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 /** DISPLAY ALL MY TICKETS **/
 const displayAllMyTickets = () => {
@@ -44,6 +44,6 @@ const displayAllMyTickets = () => {
       console.log('Error displaying tickets: ', error.response.data);
       commandPrompts.commandPrompt();
     });
-}
+};
 
 module.exports.displayAllMyTickets = displayAllMyTickets;

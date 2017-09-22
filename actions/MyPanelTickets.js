@@ -19,7 +19,7 @@ const setGlobalVariables = () => {
   github_handle = globalVars.github_handle;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 /** DISPLAY ALL OF USER'S TICKETS ASSOCIATED WITH A PANEL **/
 const displayMyPanelTickets = (panelId) => {
@@ -36,7 +36,7 @@ const displayMyPanelTickets = (panelId) => {
 
     .then(tickets => {
       if (tickets.data.length === 0) {
-        console.log('No tickets assigned to you for that panel!')
+        console.log('No tickets assigned to you for that panel!');
         commandPrompts.commandPrompt();
       } else {
         tickets.data.forEach(ticket => {
