@@ -17,7 +17,7 @@ const setGlobalVariables = () => {
   github_handle = globalVars.github_handle;
   api_key = globalVars.api_key;
   board_id = globalVars.board_id;
-}
+};
 
 /** DISPLAY ALL MY TICKETS **/
 const displayAllMyTickets = () => {
@@ -30,7 +30,7 @@ const displayAllMyTickets = () => {
     colWidths: [15, 20, 50, 15, 15, 15, 25, 15]
   });
   
-  axios.get('http://localhost:3000/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle}})
+  axios.get('https://otter-io.herokuapp.com/cli/tickets', {params: {api_key: api_key, board_id: board_id, user_id: user_id, github_handle: github_handle}})
 
     .then(tickets => {
       tickets.data.forEach(ticket => {
@@ -44,6 +44,6 @@ const displayAllMyTickets = () => {
       console.log('Error displaying tickets: ', error.response.data);
       commandPrompts.commandPrompt();
     });
-}
+};
 
 module.exports.displayAllMyTickets = displayAllMyTickets;
